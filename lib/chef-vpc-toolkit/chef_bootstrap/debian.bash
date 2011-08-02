@@ -5,28 +5,16 @@ CODENAME=$(/usr/bin/lsb_release -cs)
 local INSTALL_TYPE=${1:-"CLIENT"} # CLIENT/SERVER
 
 local CDN_BASE="http://c2521002.cdn.cloudfiles.rackspacecloud.com"
-local TARBALL="chef-client-0.9.16-ubuntu.10.10-x86_64.tar.gz"
+local TARBALL="chef-client-0.9.16-debian.6.0-x86_64.tar.gz"
 
-if [[ "$CODENAME" == "lucid" ]]; then
+if [[ "$CODENAME" == "squeeze" ]]; then
 	if [[ "$INSTALL_TYPE" == "SERVER" ]]; then
-		TARBALL="chef-server-0.9.16-ubuntu.10.04-x86_64.tar.gz"
+		TARBALL="chef-server-0.9.16-debian.6.0-x86_64.tar.gz"
 	else
-		TARBALL="chef-client-0.9.16-ubuntu.10.04-x86_64.tar.gz"
-	fi
-elif [[ "$CODENAME" == "maverick" ]]; then
-	if [[ "$INSTALL_TYPE" == "SERVER" ]]; then
-		TARBALL="chef-server-0.9.16-ubuntu.10.10-x86_64.tar.gz"
-	else
-		TARBALL="chef-client-0.9.16-ubuntu.10.10-x86_64.tar.gz"
-	fi
-elif [[ "$CODENAME" == "natty" ]]; then
-	if [[ "$INSTALL_TYPE" == "SERVER" ]]; then
-		TARBALL="chef-server-0.9.18-ubuntu.11.04-x86_64.tar.gz"
-	else
-		TARBALL="chef-client-0.9.18-ubuntu.11.04-x86_64.tar.gz"
+        TARBALL="chef-client-0.9.16-debian.6.0-x86_64.tar.gz"
 	fi
 else
-	echo "Only Ubuntu 10.04, 10.10, and 11.04 are supported."; exit 1;
+	echo "Only Debian 6.0 (Squeeze) is supported at this time."; exit 1;
 fi
 
 apt-get update &> /dev/null || { echo "Failed to apt-get update."; exit 1; }

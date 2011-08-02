@@ -12,7 +12,7 @@ The Chef VPC Toolkit is a set of Rake tasks that provide a framework to help aut
 
 -Uses Cloud Servers VPC to create secure groups of servers in the public cloud.
 
--Supports Centos, Fedora, RHEL, and Ubuntu.
+-Supports Debian, Ubuntu, Fedora, RHEL, and Centos.
 
 -Creates a local Chef Server within the server group.
 

@@ -5,12 +5,12 @@
     "vpn_device": "tun",
 	"servers": {
 		"login": {
-			"image_id": "69",
+			"image_id": "75",
 			"flavor_id": "2",
 			"openvpn_server": "true"
 		},
 		"client1": {
-			"image_id": "69",
+			"image_id": "75",
 			"flavor_id": "2"
 		}
 	}
