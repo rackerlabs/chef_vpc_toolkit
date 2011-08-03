@@ -395,6 +395,8 @@ class ServerGroup
 					"centos"
 				when 187811 # Centos 5.4
 					"centos"
+				when 78 # Fedora 15
+					"fedora"
 				when 71 # Fedora 14
 					"fedora"
 				when 53 # Fedora 13
@@ -405,6 +407,10 @@ class ServerGroup
 					"rhel"
 				when 62 # RHEL 5.5
 					"rhel"
+				when 75 # Debian 6.0
+					"ubuntu"
+				when 76 # Ubuntu 11.04
+					"ubuntu"
 				when 69 # Ubuntu 10.10
 					"ubuntu"
 				when 49 # Ubuntu 10.04
