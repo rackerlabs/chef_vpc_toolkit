@@ -243,17 +243,21 @@ done
 
 function start_chef_server {
 
-	# Ubuntu starts the Chef server automatically
-	if [ -f /bin/rpm ]; then
-		/sbin/service couchdb start 1> /dev/null
-		/sbin/chkconfig couchdb on
-		/sbin/service rabbitmq-server start </dev/null &> /dev/null
-		/sbin/chkconfig rabbitmq-server on
+	local SERVICE_BIN="/usr/sbin/service"
+	[ -f /bin/rpm ] && SERVICE_BIN="/sbin/service"
+
+	[ -d /var/run/chef ] && chown chef:chef /var/run/chef
+
+	if [ ! -f /var/run/chef/server.main.pid ]; then 
+		$SERVICE_BIN couchdb start 1> /dev/null
+		/sbin/chkconfig couchdb on &> /dev/null
+		$SERVICE_BIN rabbitmq-server start </dev/null &> /dev/null
+		/sbin/chkconfig rabbitmq-server on &> /dev/null
 
 		for svc in chef-solr chef-solr-indexer chef-server chef-server-webui
 		do
-			/sbin/service $svc start
-			/sbin/chkconfig $svc on
+			$SERVICE_BIN $svc start
+			/sbin/chkconfig $svc on &> /dev/null
 		done
 	fi
 
@@ -261,9 +265,12 @@ function start_chef_server {
 
 function start_chef_client {
 
-	/etc/init.d/chef-client start
+    local SERVICE_BIN="/usr/sbin/service"
+    [ -f /bin/rpm ] && SERVICE_BIN="/sbin/service"
+
+	$SERVICE_BIN chef-client start
     if [ -f /sbin/chkconfig ]; then
-		chkconfig chef-client on
+		chkconfig chef-client on &> /dev/null
 	fi
 
 }
