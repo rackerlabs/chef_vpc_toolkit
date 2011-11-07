@@ -1,3 +1,6 @@
+* Sun Nov 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.7.2
+  - Support for configuring and starting Chef 0.10 when preinstalled.
+
 * Thu Oct 20 2011 Dan Prince <dan.prince@rackspace.com> - 2.7.1
   - Support for image snapshots where chef is pre-installed.
 

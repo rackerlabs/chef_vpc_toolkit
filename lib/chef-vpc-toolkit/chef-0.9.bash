@@ -254,10 +254,13 @@ function start_chef_server {
 		$SERVICE_BIN rabbitmq-server start </dev/null &> /dev/null
 		/sbin/chkconfig rabbitmq-server on &> /dev/null
 
-		for svc in chef-solr chef-solr-indexer chef-server chef-server-webui
-		do
-			$SERVICE_BIN $svc start
-			/sbin/chkconfig $svc on &> /dev/null
+		# Chef 0.9: chef-solr chef-solr-indexer chef-server chef-server-webui
+		# Chef 0.10: chef-solr chef-expander chef-server chef-server-webui
+		for svc in chef-solr chef-expander chef-solr-indexer chef-server chef-server-webui; do
+            if [ -f /etc/init.d/$svc ]; then
+				$SERVICE_BIN $svc start
+				/sbin/chkconfig $svc on &> /dev/null
+			fi
 		done
 	fi
 
