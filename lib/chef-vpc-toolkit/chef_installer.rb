@@ -5,7 +5,7 @@ require 'yaml'
 module ChefVPCToolkit
 
 module ChefInstaller
-CHEF_INSTALL_FUNCTIONS=File.dirname(__FILE__) + "/chef-0.9.bash"
+CHEF_INSTALL_FUNCTIONS=File.dirname(__FILE__) + "/chef_functions.bash"
 
 def self.load_configs
 
@@ -74,7 +74,7 @@ json=JSON.parse(IO.read(options["chef_json_file"]))
 configure_client_script=""
 start_client_script=""
 if json.has_key?(options["chef_server_name"]) then
-	configure_client_script="configure_chef_client '#{options['chef_server_name']}' ''"
+	configure_client_script="configure_chef_client '#{options['chef_server_name']}' '' '#{options['chef_interval']}'"
 	start_client_script="start_chef_client"
 end
 knife_add_nodes_script=""
@@ -172,7 +172,7 @@ def self.install_chef_client(options, client_name, client_validation_key, os_typ
 	#{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
 	#{IO.read(CHEF_INSTALL_FUNCTIONS)}
 	#{install_chef_script('CLIENT', os_type)}
-	configure_chef_client '#{options['chef_server_name']}' '#{client_validation_key}'
+	configure_chef_client '#{options['chef_server_name']}' '#{client_validation_key}' '#{options['chef_interval']}'
 	start_chef_client
 	EOF_BASH
 	EOF_GATEWAY
@@ -296,13 +296,13 @@ def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-r
 
 end
 
-def self.poll_clients(options, client_names, timeout=600)
+def self.poll_clients(options, client_names, timeout=600, restart_timeout=600, restart_once_on_failure="")
 
 output=%x{
 ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 ssh #{options['chef_server_name']} bash <<-"EOF_BASH"
 #{IO.read(CHEF_INSTALL_FUNCTIONS)}
-poll_chef_client_online "#{client_names}" "#{timeout}"
+poll_chef_client_online "#{client_names}" "#{timeout}" "#{restart_timeout}" "#{restart_once_on_failure}"
 EOF_BASH
 EOF_GATEWAY
 }

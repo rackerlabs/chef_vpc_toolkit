@@ -1,6 +1,8 @@
 # Installation functions for Chef 0.8 RPMs obtained from the ELFF repo.
 export CHEF_STATUS_PORT="1234"
 export STATUS_MONITOR_DIR="/root/status_monitor"
+export SERVICE_BIN="/usr/sbin/service"
+[ -f /bin/rpm ] && SERVICE_BIN="/sbin/service"
 
 function configure_chef_server {
 
@@ -14,14 +16,15 @@ function print_client_validation_key {
 
 function configure_chef_client {
 
-if (( $# != 2 )); then
+if (( $# != 3 )); then
 	echo "Unable to configure chef client."
-	echo "usage: configure_chef_client <server_name> <client_validation_key>"
+	echo "usage: configure_chef_client <server_name> <client_validation_key> <interval>"
 	exit 1
 fi
 
 local SERVER_NAME=$1
 local CLIENT_VALIDATION_KEY=$2
+local INTERVAL=${3:-"600"} # default is 10 minutes
 
 if [ ! -f "/etc/chef/validation.pem" ]; then
 	cat > /etc/chef/validation.pem <<-EOF_VALIDATION_PEM
@@ -46,8 +49,8 @@ EOF_CAT_CHEF_CLIENT_CONF
 
 local CHEF_SYSCONFIG=/etc/default/chef-client
 [ -d /etc/sysconfig/ ] && CHEF_SYSCONFIG=/etc/sysconfig/chef-client
-cat > $CHEF_SYSCONFIG <<-"EOF_CAT_CHEF_SYSCONFIG"
-INTERVAL=600
+cat > $CHEF_SYSCONFIG <<-EOF_CAT_CHEF_SYSCONFIG
+INTERVAL=$INTERVAL
 SPLAY=20
 CONFIG=/etc/chef/client.rb
 LOGFILE=/var/log/chef/client.log
@@ -243,9 +246,6 @@ done
 
 function start_chef_server {
 
-	local SERVICE_BIN="/usr/sbin/service"
-	[ -f /bin/rpm ] && SERVICE_BIN="/sbin/service"
-
 	[ -d /var/run/chef ] && chown chef:chef /var/run/chef
 
 	if [ ! -f /var/run/chef/server.main.pid ]; then 
@@ -267,9 +267,6 @@ function start_chef_server {
 }
 
 function start_chef_client {
-
-    local SERVICE_BIN="/usr/sbin/service"
-    [ -f /bin/rpm ] && SERVICE_BIN="/sbin/service"
 
 	$SERVICE_BIN chef-client start
     if [ -f /sbin/chkconfig ]; then
@@ -312,28 +309,49 @@ function poll_chef_client_online {
 
 local CLIENT_NAMES=${1:?"Please specify a chef client name."}
 local SECS=${2:-"600"} #10 minutes
+local RESTART_TIMEOUT=${3:-"$SECS"} #Restart clients if they haven't finished by timeout
+local RESTART_ON_FAILURE=${4} #Restart clients on failure (once)
+local TMP_RESTART=$(mktemp)
 
 local SLEEP_COUNT=5
 local COUNT=1
 local MAX_COUNT=$(( $SECS / $SLEEP_COUNT ))
+local MAX_RETRY_COUNT=$(( $RESTART_TIMEOUT / $SLEEP_COUNT ))
 local FAILED_CLIENTS=""
 local ALL_ONLINE="true"
 until (( $COUNT == $MAX_COUNT )); do
-    ALL_ONLINE="true"
-    FAILED_CLIENTS=""
-    for NAME in $CLIENT_NAMES; do
-            if ! grep "$NAME:" $STATUS_MONITOR_DIR/status.out | tail -n 1 | grep -c ":ONLINE" &> /dev/null; then
-                ALL_ONLINE="false"
-                FAILED_CLIENTS="$NAME $FAILED_CLIENTS"
-            fi
-    done
-    if [[ $ALL_ONLINE == "true" ]]; then
-        echo "All Chef client(s) ran successfully."
-        return 0
-    fi
-    COUNT=$(( $COUNT + 1 ))
-    sleep $SLEEP_COUNT
+	ALL_ONLINE="true"
+	FAILED_CLIENTS=""
+	for NAME in $CLIENT_NAMES; do
+			if ! grep "$NAME:" $STATUS_MONITOR_DIR/status.out | tail -n 1 | grep -c ":ONLINE" &> /dev/null; then
+				ALL_ONLINE="false"
+				FAILED_CLIENTS="$NAME $FAILED_CLIENTS"
+
+				#Restart any chef clients that might have failed (do this once)
+				if [ -n "$RESTART_ON_FAILURE" ] && grep "$NAME:" $STATUS_MONITOR_DIR/status.out &> /dev/null && ! grep ":$NAME:" $TMP_RESTART &> /dev/null; then
+					echo ":$NAME:" >> $TMP_RESTART
+					ssh "$NAME" bash <<-EOF_SSH_CHEF_RESTART
+						$SERVICE_BIN chef-client restart
+					EOF_SSH_CHEF_RESTART
+				fi
+
+				#Restart any chef clients that haven't completed by timeout
+				if (( $COUNT >= $MAX_RETRY_COUNT )) && ! grep "$NAME:" $STATUS_MONITOR_DIR/status.out &> /dev/null && ! grep ":$NAME:" $TMP_RESTART &> /dev/null; then
+					echo ":$NAME:" >> $TMP_RESTART
+					ssh "$NAME" bash <<-EOF_SSH_CHEF_RESTART
+						$SERVICE_BIN chef-client restart
+					EOF_SSH_CHEF_RESTART
+				fi
+			fi
+	done
+	if [[ $ALL_ONLINE == "true" ]]; then
+		echo "All Chef client(s) ran successfully."
+		return 0
+	fi
+	COUNT=$(( $COUNT + 1 ))
+	sleep $SLEEP_COUNT
 done
+[ -f "$TMP_RESTART" ] && rm $TMP_RESTART
 
 echo "Chef client(s) failed to run: $FAILED_CLIENTS"
 return 1

@@ -219,6 +219,8 @@ namespace :chef do
 		
 		server_list=ENV['SERVER_NAME']
 		timeout=ENV['CHEF_TIMEOUT']
+		restart_timeout=ENV['CHEF_RESTART_TIMEOUT'] # restart if it takes this long
+		restart_on_failure=ENV['CHEF_RESTART_ON_FAILURE'] # restart once on failure
 		group=ServerGroup.fetch(:source => "cache")
 		if server_list.nil? or server_list.empty?
 		    server_list=group.server_names.collect{|x| x+" "}.join.to_s
@@ -229,7 +231,7 @@ namespace :chef do
 		configs=ChefInstaller.load_configs
 		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
         puts "Polling for Chef clients to finish running..."
-        if not ChefInstaller.poll_clients(configs, server_list, timeout) then
+        if not ChefInstaller.poll_clients(configs, server_list, timeout, restart_timeout, restart_on_failure) then
 			raise "Chef client timeout."
 		end
 

@@ -1,3 +1,7 @@
+* Tue Nov 8 2011 Dan Prince <dan.prince@rackspace.com> - 2.8.0
+  - Add chef_interval option to chef_installer.conf.
+  - Add RESTART_ON_FAILURE and RESTART_TIMEOUT options to poll_clients task.
+
 * Sun Nov 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.7.2
   - Support for configuring and starting Chef 0.10 when preinstalled.
 
