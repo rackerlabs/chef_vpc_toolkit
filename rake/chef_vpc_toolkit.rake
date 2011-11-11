@@ -177,6 +177,11 @@ namespace :chef do
 		group=ServerGroup.fetch(:source => "cache")
 		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
 
+		json_config_file=ENV['CONFIG']
+		if not json_config_file.nil? then
+			configs["chef_json_file"] = json_config_file
+		end
+
 		server_name=ENV['SERVER_NAME']
 		if server_name.nil? then
 			client_validation_key=ChefInstaller.install_chef_server(configs, group.os_types)
