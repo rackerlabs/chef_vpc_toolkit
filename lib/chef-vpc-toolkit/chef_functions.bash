@@ -38,6 +38,7 @@ local CHEF_NOTIFICATION_HANDLER=/var/lib/chef/handlers/netcat.rb
 sed -e "s|localhost|$SERVER_NAME|g" -i $CLIENT_CONFIG
 sed -e "s|^chef_server_url.*|chef_server_url \"http://$SERVER_NAME:4000\"|g" -i $CLIENT_CONFIG
 sed -e "s|^log_location.*|log_location \"\/var/log/chef/client.log\"|g" -i $CLIENT_CONFIG
+if ! grep "$CHEF_NOTIFICATION_HANDLER" $CLIENT_CONFIG &> /dev/null; then
 cat >> $CLIENT_CONFIG <<-EOF_CAT_CHEF_CLIENT_CONF
 # custom Chef notification handler
 require "$CHEF_NOTIFICATION_HANDLER"
@@ -45,7 +46,7 @@ netcat_handler = NetcatHandler.new
 report_handlers << netcat_handler
 exception_handlers << netcat_handler
 EOF_CAT_CHEF_CLIENT_CONF
-
+fi
 
 local CHEF_SYSCONFIG=/etc/default/chef-client
 [ -d /etc/sysconfig/ ] && CHEF_SYSCONFIG=/etc/sysconfig/chef-client
