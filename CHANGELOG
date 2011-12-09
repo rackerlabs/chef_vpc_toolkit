@@ -2,6 +2,7 @@
   - Add JSON option for chef:install task to specify custom nodes.json files.
   - Don't re-add the notification handler to the config file if it already
     exists.
+  - Add support for cloning git:// cookbook repo URL's.
 
 * Tue Nov 8 2011 Dan Prince <dan.prince@rackspace.com> - 2.8.0
   - Add chef_interval option to chef_installer.conf.

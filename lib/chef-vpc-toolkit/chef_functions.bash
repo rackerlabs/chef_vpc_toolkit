@@ -207,16 +207,30 @@ for CB_REPO in $COOKBOOK_URLS; do
 echo -n "Downloading $CB_REPO..."
 	if [ "http:" == ${CB_REPO:0:5} ] || [ "https:" == ${CB_REPO:0:6} ]; then
 		wget --no-check-certificate "$CB_REPO" -O "/tmp/cookbook-repo.tar.gz" &> /dev/null || { echo "Failed to download cookbook tarball."; return 1; }
+	elif [ "git:" == ${CB_REPO:0:4} ]; then
+		if [ -f /usr/bin/yum ]; then
+			rpm -q git &> /dev/null || yum install -y -q git
+		elif [ -f /usr/bin/dpkg ]; then
+			dpkg -L git > /dev/null 2>&1 || apt-get install -y --quiet git > /dev/null 2>&1
+		else
+			echo "Failed to install git."
+			exit 1
+		fi
+        pushd $REPOS_BASEDIR
+        git clone "$CB_REPO"
+        popd
 	else
 		download_cloud_file "$CB_REPO" "/tmp/cookbook-repo.tar.gz"
 	fi
 echo "OK"
-[ -d "$REPOS_BASEDIR" ] || mkdir -p "$REPOS_BASEDIR"
-cd $REPOS_BASEDIR
-echo -n "Extracting $CB_REPO..."
-tar xzf /tmp/cookbook-repo.tar.gz
-rm /tmp/cookbook-repo.tar.gz
-echo "OK"
+if [ -f /tmp/cookbook-repo.tar.gz ]; then
+	[ -d "$REPOS_BASEDIR" ] || mkdir -p "$REPOS_BASEDIR"
+	cd $REPOS_BASEDIR
+	echo -n "Extracting $CB_REPO..."
+	tar xzf /tmp/cookbook-repo.tar.gz
+	rm /tmp/cookbook-repo.tar.gz
+	echo "OK"
+fi
 done
 
 }
