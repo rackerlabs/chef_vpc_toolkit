@@ -177,7 +177,7 @@ namespace :chef do
 		group=ServerGroup.fetch(:source => "cache")
 		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
 
-		json_config_file=ENV['CONFIG']
+		json_config_file=ENV['JSON']
 		if not json_config_file.nil? then
 			configs["chef_json_file"] = json_config_file
 		end
