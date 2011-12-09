@@ -268,6 +268,14 @@ function start_chef_server {
 		/sbin/chkconfig couchdb on &> /dev/null
 		$SERVICE_BIN rabbitmq-server start </dev/null &> /dev/null
 		/sbin/chkconfig rabbitmq-server on &> /dev/null
+		sleep 3
+
+		local RABBIT_ERR_SIZE=$(stat -c%s "/var/log/rabbitmq/startup_err")
+		if (( $RABBIT_ERR_SIZE > 0 )); then
+			$SERVICE_BIN rabbitmq-server stop </dev/null &> /dev/null
+			$SERVICE_BIN rabbitmq-server start </dev/null &> /dev/null
+			sleep 3
+		fi
 
 		# Chef 0.9: chef-solr chef-solr-indexer chef-server chef-server-webui
 		# Chef 0.10: chef-solr chef-expander chef-server chef-server-webui
@@ -275,6 +283,7 @@ function start_chef_server {
             if [ -f /etc/init.d/$svc ]; then
 				$SERVICE_BIN $svc start
 				/sbin/chkconfig $svc on &> /dev/null
+				sleep 3
 			fi
 		done
 	fi
