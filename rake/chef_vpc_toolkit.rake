@@ -13,7 +13,12 @@ namespace :group do
 	desc "Create a new group of cloud servers"
 	task :create => [ "init", "chef:validate_json" ] do
 
-		sg=ServerGroup.from_json_config(IO.read(ServerGroup::CONFIG_FILE))
+		json_config_file=ENV['SERVER_GROUP_JSON']
+		if json_config_file.nil? then
+			json_config_file = ServerGroup::CONFIG_FILE
+		end
+
+		sg=ServerGroup.from_json_config(IO.read(json_config_file))
 		sg=ServerGroup.create(sg)
 		puts "Server group ID #{sg.id} created."
 		
