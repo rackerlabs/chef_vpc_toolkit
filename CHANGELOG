@@ -1,3 +1,8 @@
+ -Check if known_hosts exists before trying to edit it
+ -Add SERVER_GROUP_JSON option to create task.
+ -Updates to support Openstack. Ids for images, flavors and servers are
+  treated as strings.
+
 * Tue Dec 8 2011 Dan Prince <dan.prince@rackspace.com> - 2.8.1
   - Add JSON option for chef:install task to specify custom nodes.json files.
   - Don't re-add the notification handler to the config file if it already

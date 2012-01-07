@@ -25,9 +25,9 @@ class Server
 		@description=options[:description] or @description=@name
 		@external_ip_addr=options[:external_ip_addr]
 		@internal_ip_addr=options[:internal_ip_addr]
-		@cloud_server_id_number=options[:cloud_server_id_number].to_i
-		@flavor_id=options[:flavor_id].to_i
-		@image_id=options[:image_id].to_i
+		@cloud_server_id_number=options[:cloud_server_id_number]
+		@flavor_id=options[:flavor_id]
+		@image_id=options[:image_id]
 		@admin_password=options[:admin_password]
 		@server_group_id=options[:server_group_id].to_i
 		@openvpn_server = [true, "true"].include?(options[:openvpn_server])
