@@ -1,3 +1,4 @@
+* Sun Jan 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.8.2
  -Check if known_hosts exists before trying to edit it
  -Add SERVER_GROUP_JSON option to create task.
  -Updates to support Openstack. Ids for images, flavors and servers are

@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{chef-vpc-toolkit}
-  s.version = "2.7.2"
+  s.version = "2.8.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Dan Prince"]
-  s.date = %q{2011-11-06}
+  s.date = %q{2012-01-15}
   s.default_executable = %q{chef-vpc-toolkit}
   s.description = %q{The Chef VPC Toolkit is a set of Rake tasks that provide a framework to help automate the creation and configuration of cloud server groups for development or testing. Requires Cloud Servers VPC.}
   s.email = %q{dan.prince@rackspace.com}
@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/chef-vpc-toolkit",
+    "chef-vpc-toolkit.gemspec",
     "config/chef_installer.yml",
     "config/databags.json.example",
     "config/nodes.json",
@@ -49,7 +50,6 @@ Gem::Specification.new do |s|
     "cookbook-repos/local/cookbooks/motd/templates/default/motd.erb",
     "cookbook-repos/local/roles/README",
     "lib/chef-vpc-toolkit.rb",
-    "lib/chef-vpc-toolkit/chef-0.9.bash",
     "lib/chef-vpc-toolkit/chef_bootstrap/centos.bash",
     "lib/chef-vpc-toolkit/chef_bootstrap/debian.bash",
     "lib/chef-vpc-toolkit/chef_bootstrap/fedora.bash",
@@ -57,6 +57,7 @@ Gem::Specification.new do |s|
     "lib/chef-vpc-toolkit/chef_bootstrap/ubuntu-opscode.bash",
     "lib/chef-vpc-toolkit/chef_bootstrap/ubuntu.bash",
     "lib/chef-vpc-toolkit/chef_bootstrap/unknown.bash",
+    "lib/chef-vpc-toolkit/chef_functions.bash",
     "lib/chef-vpc-toolkit/chef_installer.rb",
     "lib/chef-vpc-toolkit/cloud-servers-vpc/client.rb",
     "lib/chef-vpc-toolkit/cloud-servers-vpc/connection.rb",
